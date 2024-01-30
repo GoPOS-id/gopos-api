@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// ! LOGIN SERVICES
 func (dtos *inAuthDtos) Login() (outAuthDtos, error) {
 	db := database.DbContext()
 	userDtos := model.User{
@@ -47,6 +48,7 @@ func (dtos *inAuthDtos) Login() (outAuthDtos, error) {
 	return outDtos, nil
 }
 
+// ! LOGOUT SERVICES
 func (dtos *inAuthDtos) Logout() error {
 	db := database.DbContext()
 	tokenDtos := model.Session{

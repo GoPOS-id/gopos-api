@@ -12,7 +12,7 @@ var resp = utils.DataResponse{
 }
 
 func OperatorOnly(c *fiber.Ctx) error {
-	locals := c.Locals("user").(outAuthDtos)
+	locals := c.Locals("user").(OutAuthDtos)
 	if locals.Role != constant.Role_Operator {
 		return resp.SendMessageJSON(c)
 	}
@@ -20,7 +20,7 @@ func OperatorOnly(c *fiber.Ctx) error {
 }
 
 func AdministratorOnly(c *fiber.Ctx) error {
-	locals := c.Locals("user").(outAuthDtos)
+	locals := c.Locals("user").(OutAuthDtos)
 	op := constant.Role_Operator
 	ad := constant.Role_Adminstrator
 	if locals.Role != ad || locals.Role != op {

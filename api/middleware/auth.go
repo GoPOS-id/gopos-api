@@ -61,25 +61,25 @@ func Auth(c *fiber.Ctx) error {
 	return c.Next()
 }
 
-func checkToken(token string) (outAuthDtos, error) {
+func checkToken(token string) (OutAuthDtos, error) {
 	db := database.DbContext()
 	tokenDtos := model.Session{
 		Token: token,
 	}
 	tokenFound := model.Session{}
 	if err := db.Model(&tokenDtos).Where("token = ?", tokenDtos.Token).First(&tokenFound).Error; err != nil {
-		return outAuthDtos{}, fiber.ErrUnauthorized
+		return OutAuthDtos{}, fiber.ErrUnauthorized
 	}
 
 	userDtos := model.User{
 		Id: tokenFound.UserId,
 	}
 	userFound := model.User{}
-	if err := db.Model(&userDtos).Preload("Role").Where("id = ?", userDtos.Id).First(&userFound).Error; err != nil {
-		return outAuthDtos{}, err
+	if err := db.Preload("Role").Model(&userDtos).Where("id = ?", userDtos.Id).First(&userFound).Error; err != nil {
+		return OutAuthDtos{}, err
 	}
 
-	outDtos := outAuthDtos{
+	outDtos := OutAuthDtos{
 		Id:         userFound.Id,
 		Username:   userFound.Username,
 		Fullname:   userFound.Fullname,
@@ -92,7 +92,7 @@ func checkToken(token string) (outAuthDtos, error) {
 	return outDtos, nil
 }
 
-type outAuthDtos struct {
+type OutAuthDtos struct {
 	Id         int64  `json:"id"`
 	Username   string `json:"username"`
 	Fullname   string `json:"fullname"`

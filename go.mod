@@ -10,6 +10,8 @@ require (
 	gorm.io/gorm v1.25.6
 )
 
+require github.com/go-ozzo/ozzo-validation v3.6.0+incompatible // indirect
+
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
