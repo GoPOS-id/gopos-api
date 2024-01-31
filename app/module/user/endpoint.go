@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/GoPOS-id/gopos-api/api/middleware"
+	"github.com/GoPOS-id/gopos-api/app/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 

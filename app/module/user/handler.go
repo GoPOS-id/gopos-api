@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/GoPOS-id/gopos-api/api/middleware"
+	"github.com/GoPOS-id/gopos-api/app/middleware"
 	"github.com/GoPOS-id/gopos-api/constant"
 	"github.com/GoPOS-id/gopos-api/utils"
 	validation "github.com/go-ozzo/ozzo-validation"

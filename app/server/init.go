@@ -1,9 +1,9 @@
 package server
 
 import (
+	"github.com/GoPOS-id/gopos-api/app/module"
 	"github.com/GoPOS-id/gopos-api/config"
 	"github.com/GoPOS-id/gopos-api/database"
-	"github.com/GoPOS-id/gopos-api/module"
 )
 
 func Init() {
