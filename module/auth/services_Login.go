@@ -3,7 +3,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/GoPOS-id/gopos-api/app/model"
+	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/database"
 	"github.com/GoPOS-id/gopos-api/utils"
 	"golang.org/x/crypto/bcrypt"
@@ -46,22 +46,4 @@ func (dtos *inAuthDtos) Login() (outAuthDtos, error) {
 	}
 
 	return outDtos, nil
-}
-
-// ! LOGOUT SERVICES
-func (dtos *inAuthDtos) Logout() error {
-	db := database.DbContext()
-	tokenDtos := model.Session{
-		Token: dtos.Token,
-	}
-	tokenFound := model.Session{}
-	if err := db.Model(&tokenDtos).Where("token = ?", tokenDtos.Token).First(&tokenFound).Error; err != nil {
-		return err
-	}
-
-	if err := db.Delete(&tokenFound).Error; err != nil {
-		return err
-	}
-
-	return nil
 }

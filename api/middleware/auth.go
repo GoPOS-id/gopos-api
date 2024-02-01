@@ -3,7 +3,7 @@ package middleware
 import (
 	"strings"
 
-	"github.com/GoPOS-id/gopos-api/app/model"
+	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/config"
 	"github.com/GoPOS-id/gopos-api/database"
 	"github.com/GoPOS-id/gopos-api/utils"
