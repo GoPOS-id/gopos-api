@@ -3,8 +3,8 @@ package database
 import (
 	"log"
 
+	"github.com/GoPOS-id/gopos-api/app/model"
 	"github.com/GoPOS-id/gopos-api/config"
-	"github.com/GoPOS-id/gopos-api/model"
 	"gorm.io/gorm"
 )
 

@@ -3,8 +3,8 @@ package auth
 import (
 	"strings"
 
+	"github.com/GoPOS-id/gopos-api/app/model"
 	"github.com/GoPOS-id/gopos-api/database"
-	"github.com/GoPOS-id/gopos-api/model"
 	"github.com/GoPOS-id/gopos-api/utils"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"

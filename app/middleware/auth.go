@@ -3,9 +3,9 @@ package middleware
 import (
 	"strings"
 
+	"github.com/GoPOS-id/gopos-api/app/model"
 	"github.com/GoPOS-id/gopos-api/config"
 	"github.com/GoPOS-id/gopos-api/database"
-	"github.com/GoPOS-id/gopos-api/model"
 	"github.com/GoPOS-id/gopos-api/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"

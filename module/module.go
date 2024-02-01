@@ -1,8 +1,8 @@
 package module
 
 import (
-	"github.com/GoPOS-id/gopos-api/app/module/auth"
-	"github.com/GoPOS-id/gopos-api/app/module/user"
+	"github.com/GoPOS-id/gopos-api/module/auth"
+	"github.com/GoPOS-id/gopos-api/module/user"
 	"github.com/gofiber/fiber/v2"
 )
 
