@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/GoPOS-id/gopos-api/app/model"
+	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/constant"
 	"github.com/GoPOS-id/gopos-api/database"
 	"github.com/rs/xid"

@@ -11,24 +11,19 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var unauthorized = utils.DataResponse{
-	Code:    401,
-	Message: "Unauthorized",
-}
-
 func Auth(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 	jwtsplit := strings.Split(token, ".")
 
 	if len(jwtsplit) != 3 {
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	verify, err := jwt.ParseWithClaims(token, &utils.JWTClaims{}, func(t *jwt.Token) (interface{}, error) {
@@ -36,25 +31,20 @@ func Auth(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	if !verify.Valid {
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	user, errors := checkToken(jwtsplit[2])
 	if errors != nil {
 		switch errors {
 		case fiber.ErrUnauthorized:
-
-			return unauthorized.SendMessageJSON(c)
+			return utils.SendResponse(c, "Unauthorized", 401)
 		default:
-			resp := utils.DataResponse{
-				Code:    fiber.StatusInternalServerError,
-				Message: errors.Error(),
-			}
-			return resp.SendMessageJSON(c)
+			return utils.SendResponse(c, errors.Error(), 500)
 		}
 	}
 	c.Locals("user", user)
