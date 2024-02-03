@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/constant"
 	"github.com/GoPOS-id/gopos-api/database"
-	"github.com/GoPOS-id/gopos-api/model"
 	"github.com/rs/xid"
 	"golang.org/x/crypto/bcrypt"
 )

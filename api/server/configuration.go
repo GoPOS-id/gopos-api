@@ -6,12 +6,15 @@ import (
 	"github.com/GoPOS-id/gopos-api/utils"
 	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 )
 
 func fiberConfigrutaion() *fiber.App {
+	engine := html.New("./views", ".html")
 	return fiber.New(fiber.Config{
 		JSONEncoder: json.Marshal,
 		JSONDecoder: json.Unmarshal,
+		Views:       engine,
 		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			code := fiber.StatusInternalServerError
 			msg := "Internal Server Error"
@@ -19,27 +22,18 @@ func fiberConfigrutaion() *fiber.App {
 			var e *fiber.Error
 			if errors.As(err, &e) {
 				code = e.Code
-				if code == fiber.StatusNotFound {
+				if code == 404 {
 					msg = "Not Found"
-				} else if code == fiber.StatusInternalServerError {
+				} else if code == 500 {
 					msg = "Internal Server Error"
 				} else {
 					msg = e.Message
 				}
 			}
-
-			resp := utils.DataResponse{
-				Code:    code,
-				Message: msg,
-			}
-			err = resp.SendMessageJSON(c)
+			err = utils.SendResponse(c, msg, code)
 
 			if err != nil {
-				resp := utils.DataResponse{
-					Code:    500,
-					Message: "Internal Server Error",
-				}
-				return resp.SendMessageJSON(c)
+				return utils.SendResponse(c, "Internal Server Error", 500)
 			}
 
 			return nil

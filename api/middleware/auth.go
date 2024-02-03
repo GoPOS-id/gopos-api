@@ -3,32 +3,27 @@ package middleware
 import (
 	"strings"
 
+	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/config"
 	"github.com/GoPOS-id/gopos-api/database"
-	"github.com/GoPOS-id/gopos-api/model"
 	"github.com/GoPOS-id/gopos-api/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
 )
-
-var unauthorized = utils.DataResponse{
-	Code:    401,
-	Message: "Unauthorized",
-}
 
 func Auth(c *fiber.Ctx) error {
 	authHeader := c.Get("Authorization")
 
 	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 	jwtsplit := strings.Split(token, ".")
 
 	if len(jwtsplit) != 3 {
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	verify, err := jwt.ParseWithClaims(token, &utils.JWTClaims{}, func(t *jwt.Token) (interface{}, error) {
@@ -36,50 +31,45 @@ func Auth(c *fiber.Ctx) error {
 	})
 
 	if err != nil {
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	if !verify.Valid {
-		return unauthorized.SendMessageJSON(c)
+		return utils.SendResponse(c, "Unauthorized", 401)
 	}
 
 	user, errors := checkToken(jwtsplit[2])
 	if errors != nil {
 		switch errors {
 		case fiber.ErrUnauthorized:
-
-			return unauthorized.SendMessageJSON(c)
+			return utils.SendResponse(c, "Unauthorized", 401)
 		default:
-			resp := utils.DataResponse{
-				Code:    fiber.StatusInternalServerError,
-				Message: errors.Error(),
-			}
-			return resp.SendMessageJSON(c)
+			return utils.SendResponse(c, errors.Error(), 500)
 		}
 	}
 	c.Locals("user", user)
 	return c.Next()
 }
 
-func checkToken(token string) (outAuthDtos, error) {
+func checkToken(token string) (OutAuthDtos, error) {
 	db := database.DbContext()
 	tokenDtos := model.Session{
 		Token: token,
 	}
 	tokenFound := model.Session{}
 	if err := db.Model(&tokenDtos).Where("token = ?", tokenDtos.Token).First(&tokenFound).Error; err != nil {
-		return outAuthDtos{}, fiber.ErrUnauthorized
+		return OutAuthDtos{}, fiber.ErrUnauthorized
 	}
 
 	userDtos := model.User{
 		Id: tokenFound.UserId,
 	}
 	userFound := model.User{}
-	if err := db.Model(&userDtos).Preload("Role").Where("id = ?", userDtos.Id).First(&userFound).Error; err != nil {
-		return outAuthDtos{}, err
+	if err := db.Preload("Role").Model(&userDtos).Where("id = ?", userDtos.Id).First(&userFound).Error; err != nil {
+		return OutAuthDtos{}, err
 	}
 
-	outDtos := outAuthDtos{
+	outDtos := OutAuthDtos{
 		Id:         userFound.Id,
 		Username:   userFound.Username,
 		Fullname:   userFound.Fullname,
@@ -92,7 +82,7 @@ func checkToken(token string) (outAuthDtos, error) {
 	return outDtos, nil
 }
 
-type outAuthDtos struct {
+type OutAuthDtos struct {
 	Id         int64  `json:"id"`
 	Username   string `json:"username"`
 	Fullname   string `json:"fullname"`
