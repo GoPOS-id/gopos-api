@@ -12,7 +12,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// ! CREATE USER Services
 func (dto *inUserDto) Create() (outUserDto, error) {
 	db := database.DbContext()
 
@@ -63,7 +62,6 @@ func (dto *inUserDto) Create() (outUserDto, error) {
 	return outDto, nil
 }
 
-// ! UPDATE USER Services
 func (dto *inUserDto) Update() (outUserDto, error) {
 	db := database.DbContext()
 	userDtos := model.User{
@@ -105,4 +103,22 @@ func (dto *inUserDto) Update() (outUserDto, error) {
 	}
 
 	return outDto, nil
+}
+
+func (dto *inUserDto) Delete() error {
+	db := database.DbContext()
+
+	userDtos := model.User{
+		Id: dto.Id,
+	}
+	userFound := model.User{}
+	if err := db.Model(&userDtos).Where("id = ?", userDtos.Id).First(&userFound).Error; err != nil {
+		return err
+	}
+
+	if err := db.Model(&userFound).Delete(&userFound).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
