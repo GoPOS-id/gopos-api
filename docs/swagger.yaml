@@ -3,43 +3,32 @@ definitions:
   auth.inAuthDtos:
     properties:
       password:
-        description: Password for authentication
         type: string
       username:
-        description: Username for authentication
         type: string
     type: object
   auth.outAuthDtos:
     properties:
       id:
-        description: User ID
         type: integer
       token:
-        description: JWT token for authentication
         type: string
       username:
-        description: Username of the authenticated user
         type: string
     type: object
   user.inUserDto:
     properties:
       email:
-        description: Email address of the user
         type: string
       fullname:
-        description: Full name of the user
         type: string
       id:
-        description: User ID (used in update operations)
         type: integer
       password:
-        description: Password for the user
         type: string
       role_id:
-        description: Role ID assigned to the user
         type: integer
       username:
-        description: Username for the user
         type: string
     type: object
   user.outPaginateDto:
@@ -50,25 +39,18 @@ definitions:
   user.outUserDto:
     properties:
       created_at:
-        description: Timestamp indicating when the user was created
         type: string
       email:
-        description: Email address of the user
         type: string
       fullname:
-        description: Full name of the user
         type: string
       id:
-        description: User ID
         type: integer
       role:
-        description: Role assigned to the user
         type: string
       username:
-        description: Username of the user
         type: string
       verfied_at:
-        description: Timestamp indicating when the user was verified
         type: string
     type: object
   utils.DataResponse:
@@ -163,6 +145,54 @@ paths:
       tags:
       - Authentication
   /user:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user data with the provided information
+      operationId: deleteUser
+      parameters:
+      - default: '"Bearer "'
+        description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Delete user data
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/user.inUserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Delete user data
+      tags:
+      - User
     get:
       description: Retrieves the profile data for the authenticated user.
       operationId: getProfile

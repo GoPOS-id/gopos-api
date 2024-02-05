@@ -249,6 +249,77 @@ const docTemplate = `{
                     }
                 }
             },
+            "delete": {
+                "description": "Delete user data with the provided information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Delete user data",
+                "operationId": "deleteUser",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "default": "\"Bearer \"",
+                        "description": "Bearer \u003caccess_token\u003e",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Delete user data",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/user.inUserDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User updated successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            },
             "patch": {
                 "description": "Update user data with the provided information",
                 "consumes": [
@@ -403,11 +474,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "password": {
-                    "description": "Password for authentication",
                     "type": "string"
                 },
                 "username": {
-                    "description": "Username for authentication",
                     "type": "string"
                 }
             }
@@ -416,15 +485,12 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "id": {
-                    "description": "User ID",
                     "type": "integer"
                 },
                 "token": {
-                    "description": "JWT token for authentication",
                     "type": "string"
                 },
                 "username": {
-                    "description": "Username of the authenticated user",
                     "type": "string"
                 }
             }
@@ -433,27 +499,21 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
-                    "description": "Email address of the user",
                     "type": "string"
                 },
                 "fullname": {
-                    "description": "Full name of the user",
                     "type": "string"
                 },
                 "id": {
-                    "description": "User ID (used in update operations)",
                     "type": "integer"
                 },
                 "password": {
-                    "description": "Password for the user",
                     "type": "string"
                 },
                 "role_id": {
-                    "description": "Role ID assigned to the user",
                     "type": "integer"
                 },
                 "username": {
-                    "description": "Username for the user",
                     "type": "string"
                 }
             }
@@ -469,31 +529,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "created_at": {
-                    "description": "Timestamp indicating when the user was created",
                     "type": "string"
                 },
                 "email": {
-                    "description": "Email address of the user",
                     "type": "string"
                 },
                 "fullname": {
-                    "description": "Full name of the user",
                     "type": "string"
                 },
                 "id": {
-                    "description": "User ID",
                     "type": "integer"
                 },
                 "role": {
-                    "description": "Role assigned to the user",
                     "type": "string"
                 },
                 "username": {
-                    "description": "Username of the user",
                     "type": "string"
                 },
                 "verfied_at": {
-                    "description": "Timestamp indicating when the user was verified",
                     "type": "string"
                 }
             }
