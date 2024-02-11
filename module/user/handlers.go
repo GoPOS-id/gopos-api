@@ -1,12 +1,13 @@
 package user
 
 import (
+	"strconv"
+
 	"github.com/GoPOS-id/gopos-api/api/middleware"
 	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/database"
 	"github.com/GoPOS-id/gopos-api/utils"
 	"github.com/gofiber/fiber/v2"
-	"gorm.io/gorm"
 )
 
 // @Tags User
@@ -36,16 +37,33 @@ func getProfileHandler(c *fiber.Ctx) error {
 // @Router /user/all [get]
 func getAllUsersHandler(c *fiber.Ctx) error {
 	page := c.QueryInt("page", 1)
-	offset := (page - 1) * 25
+	limit := 20
+	offset := (page - 1) * limit
+	category := c.Query("category", "all")
 
 	db := database.DbContext()
 
 	var usersDtos []model.User
-	if err := db.Model(&model.User{}).Preload("Role").Offset(offset).Limit(25).Find(&usersDtos).Error; err != nil {
-		return utils.SendResponse(c, err.Error(), 500)
+	switch category {
+	case "operator":
+		if err := db.Model(&model.User{}).Preload("Role").Where("role_id = ?", 1).Offset(offset).Limit(limit).Order("role_id asc").Find(&usersDtos).Error; err != nil {
+			return utils.SendResponse(c, err.Error(), 500)
+		}
+	case "administrator":
+		if err := db.Model(&model.User{}).Preload("Role").Where("role_id = ?", 2).Offset(offset).Limit(limit).Order("role_id asc").Find(&usersDtos).Error; err != nil {
+			return utils.SendResponse(c, err.Error(), 500)
+		}
+	case "cashier":
+		if err := db.Model(&model.User{}).Preload("Role").Where("role_id = ?", 3).Offset(offset).Limit(limit).Order("role_id asc").Find(&usersDtos).Error; err != nil {
+			return utils.SendResponse(c, err.Error(), 500)
+		}
+	default:
+		if err := db.Model(&model.User{}).Preload("Role").Offset(offset).Limit(limit).Order("role_id asc").Find(&usersDtos).Error; err != nil {
+			return utils.SendResponse(c, err.Error(), 500)
+		}
 	}
 
-	outUserDtos, previous, next, totalItems, totalPages := handleUsersPagination(db, usersDtos, page)
+	outUserDtos, previous, next, totalItems, totalPages := handleUsersPagination(db, category, usersDtos, page, limit)
 
 	paginate := mapPaginationUsers(page, previous, next, totalItems, totalPages)
 
@@ -86,7 +104,7 @@ func createUserHandler(c *fiber.Ctx) error {
 
 	user, err := dtos.Create()
 	if err != nil {
-		return handleErrCreateResponse(c, err)
+		return handleErr(c, err)
 	}
 
 	return utils.SendDataResponse(c, "Create User Successfully", user, 200)
@@ -123,9 +141,9 @@ func updateUserHandler(c *fiber.Ctx) error {
 		return utils.SendResponse(c, "Can't change role higher than your currnet role", 400)
 	}
 
-	user, errDtos := dtos.Update()
+	user, errDtos := dtos.Update(locals)
 	if errDtos != nil {
-		return handleErrUpdateUser(c, errDtos)
+		return handleErr(c, errDtos)
 	}
 
 	return utils.SendDataResponse(c, "Success update data users", user, 200)
@@ -163,12 +181,38 @@ func deleteUserHandler(c *fiber.Ctx) error {
 	}
 
 	if err := dtos.Delete(); err != nil {
-		switch err {
-		case gorm.ErrRecordNotFound:
-			return utils.SendResponse(c, "Oops!, User not Found", 400)
-		default:
-			return utils.SendResponse(c, err.Error(), 500)
-		}
+		return handleErr(c, err)
 	}
 	return utils.SendResponse(c, "Delete user successfully", 200)
+}
+
+// @Summary Show User by ID
+// @Description Show user data by ID with the provided information
+// @ID showIdUser
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param Authorization header string true "Bearer <access_token>" default("Bearer ")
+// @Success 200 {object} utils.Response "Show User updated successfully"
+// @Failure 400 {object} utils.Response "Bad Request"
+// @Failure 401 {object} utils.Response "Unauthorized"
+// @Failure 404 {object} utils.Response "User not found"
+// @Failure 409 {object} utils.Response "Conflict"
+// @Failure 500 {object} utils.Response "Internal Server Error"
+// @Router /user/view/{id} [get]
+func viewUserHandler(c *fiber.Ctx) error {
+	params := c.Params("userid")
+	userid, err := strconv.Atoi(params)
+	if err != nil {
+		return utils.SendResponse(c, "User ID not found", 404)
+	}
+	dtos := inUserDto{Id: int64(userid)}
+
+	user, errors := dtos.GetProfile()
+	if errors != nil {
+		return handleErr(c, errors)
+	}
+
+	return utils.SendDataResponse(c, "Show ID "+params+" successfully", user, 200)
+
 }

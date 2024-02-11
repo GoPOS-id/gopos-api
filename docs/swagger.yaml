@@ -50,7 +50,7 @@ definitions:
         type: string
       username:
         type: string
-      verfied_at:
+      verified_at:
         type: string
     type: object
   utils.DataResponse:
@@ -364,6 +364,49 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Get All Users
+      tags:
+      - User
+  /user/view/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Show user data by ID with the provided information
+      operationId: showIdUser
+      parameters:
+      - default: '"Bearer "'
+        description: Bearer <access_token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Show User updated successfully
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: User not found
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Show User by ID
       tags:
       - User
 securityDefinitions:
