@@ -17,7 +17,7 @@ type outUserDto struct {
 	Fullname   string     `json:"fullname"`
 	Email      string     `json:"email"`
 	Role       string     `json:"role"`
-	VerifiedAt *time.Time `json:"verfied_at"`
+	VerifiedAt *time.Time `json:"verified_at"`
 	CreatedAt  time.Time  `json:"created_at"`
 }
 

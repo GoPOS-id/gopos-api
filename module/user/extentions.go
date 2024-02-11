@@ -30,20 +30,20 @@ func handleAddRolePermission(roleId uint, role string) bool {
 	return true
 }
 
-func handleErrCreateResponse(c *fiber.Ctx, err error) error {
-	switch err {
-	case fiber.ErrBadRequest:
-		return utils.SendResponse(c, "Username already exists", 400)
-	default:
-		return utils.SendResponse(c, err.Error(), 500)
-	}
-}
-
-func handleUsersPagination(db *gorm.DB, dtos []model.User, page int) ([]outUserDto, int, int, int64, int64) {
+func handleUsersPagination(db *gorm.DB, category string, dtos []model.User, page int, limit int) ([]outUserDto, int, int, int64, int64) {
 	var totalItems int64
-	db.Model(&model.User{}).Count(&totalItems)
+	switch category {
+	case "operator":
+		db.Model(&model.User{}).Where("role_id = ?", 1).Count(&totalItems)
+	case "administrator":
+		db.Model(&model.User{}).Where("role_id = ?", 2).Count(&totalItems)
+	case "cashier":
+		db.Model(&model.User{}).Where("role_id = ?", 3).Count(&totalItems)
+	default:
+		db.Model(&model.User{}).Count(&totalItems)
+	}
 
-	totalPages := (totalItems + int64(25) - 1) / int64(25)
+	totalPages := (totalItems + int64(limit) - 1) / int64(limit)
 
 	var previous int = page - 1
 	var next int = page + 1
@@ -101,10 +101,14 @@ func handleUpdateUserValidator(dtos *inUserDto) error {
 	)
 }
 
-func handleErrUpdateUser(c *fiber.Ctx, err error) error {
+func handleErr(c *fiber.Ctx, err error) error {
 	switch err {
 	case gorm.ErrRecordNotFound:
 		return utils.SendResponse(c, "User not found", 404)
+	case fiber.ErrBadRequest:
+		return utils.SendResponse(c, "Username already exists", 400)
+	case fiber.ErrNotAcceptable:
+		return utils.SendResponse(c, "Oops!, You dont have permission to change the roles!", 400)
 	default:
 		return utils.SendResponse(c, err.Error(), 500)
 	}

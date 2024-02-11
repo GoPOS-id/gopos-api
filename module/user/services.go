@@ -3,6 +3,7 @@ package user
 import (
 	"time"
 
+	"github.com/GoPOS-id/gopos-api/api/middleware"
 	"github.com/GoPOS-id/gopos-api/api/model"
 	"github.com/GoPOS-id/gopos-api/constant"
 	"github.com/GoPOS-id/gopos-api/database"
@@ -62,7 +63,7 @@ func (dto *inUserDto) Create() (outUserDto, error) {
 	return outDto, nil
 }
 
-func (dto *inUserDto) Update() (outUserDto, error) {
+func (dto *inUserDto) Update(locals middleware.OutAuthDtos) (outUserDto, error) {
 	db := database.DbContext()
 	userDtos := model.User{
 		Id: dto.Id,
@@ -71,6 +72,13 @@ func (dto *inUserDto) Update() (outUserDto, error) {
 	if err := db.Preload("Role").Model(&userDtos).Where("id = ?", userDtos.Id).First(&userFound).Error; err != nil {
 		return outUserDto{}, err
 	}
+
+	if locals.Role != "operator" {
+		if dto.RoleId != userFound.RoleId {
+			return outUserDto{}, fiber.ErrNotAcceptable
+		}
+	}
+
 	var passwd string = userFound.Password
 	if dto.Password != "" {
 		genereate, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
@@ -121,4 +129,26 @@ func (dto *inUserDto) Delete() error {
 	}
 
 	return nil
+}
+
+func (dto *inUserDto) GetProfile() (outUserDto, error) {
+	db := database.DbContext()
+
+	userDto := model.User{Id: dto.Id}
+	foundDto := model.User{}
+	if err := db.Preload("Role").Model(&userDto).Where("id = ?", userDto.Id).First(&foundDto).Error; err != nil {
+		return outUserDto{}, err
+	}
+
+	res := outUserDto{
+		Id:         foundDto.Id,
+		Username:   foundDto.Username,
+		Fullname:   foundDto.Fullname,
+		Email:      foundDto.Email,
+		Role:       foundDto.Role.Name,
+		VerifiedAt: foundDto.VerifiedAt,
+		CreatedAt:  foundDto.CreatedAt,
+	}
+
+	return res, nil
 }
